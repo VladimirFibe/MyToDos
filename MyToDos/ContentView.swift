@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  MyToDos
-//
-//  Created by Vladimir Fibe on 23.10.2023.
-//
-
 import SwiftUI
 
 struct ContentView: View {
