@@ -35,6 +35,9 @@ struct ContentView: View {
             .foregroundStyle(.red)
         }
         .sheet(item: $modalType) { $0 }
+        .alert(item: $dataStore.appError) {
+            Alert(title: Text("Oh Oh"), message: Text($0.error.localizedDescription))
+        }
     }
 }
 
