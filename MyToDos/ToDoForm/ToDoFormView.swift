@@ -29,13 +29,13 @@ extension ToDoFormView {
             name: viewModel.name,
             completed: viewModel.comleted
         )
-        dataStore.updateToDo(toDo)
+        dataStore.updateToDo.send(toDo)
         dismiss()
     }
 
     func addToDo() {
         let toDo = ToDo(name: viewModel.name)
-        dataStore.addToDo(toDo)
+        dataStore.addToDo.send(toDo)
         dismiss()
     }
 

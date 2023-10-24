@@ -1,35 +1,44 @@
-//
-//  DataStore.swift
-//  MyToDos
-//
-//  Created by Vladimir Fibe on 23.10.2023.
-//
-
 import SwiftUI
-
+import Combine
 class DataStore: ObservableObject {
     @Published var toDos: [ToDo] = []
     @Published var appError: ErrorType? = nil
+    var subscriptions = Set<AnyCancellable>()
+    var addToDo = PassthroughSubject<ToDo, Never>()
+    var updateToDo = PassthroughSubject<ToDo, Never>()
+    var deleteToDo = PassthroughSubject<IndexSet, Never>()
+
     init() {
         print(FileManager.docDirURL.path)
+        addSubscriptions()
+
         if FileManager().docExist(named: fileName) {
             loadToDos()
         }
     }
-    func addToDo(_ toDo: ToDo) {
-        toDos.append(toDo)
-        saveToDos()
-    }
 
-    func updateToDo(_ toDo: ToDo) {
-        guard let index = toDos.firstIndex(where: {$0.id == toDo.id}) else { return }
-        toDos[index] = toDo
-        saveToDos()
-    }
+    func addSubscriptions() {
+        addToDo
+            .sink {[unowned self] toDo in
+                toDos.append(toDo)
+                saveToDos()
+            }
+            .store(in: &subscriptions)
 
-    func deleteToDo(at indexSet: IndexSet) {
-        toDos.remove(atOffsets: indexSet)
-        saveToDos()
+        updateToDo
+            .sink { [unowned self] toDo in
+                guard let index = toDos.firstIndex(where: {$0.id == toDo.id}) else { return }
+                toDos[index] = toDo
+                saveToDos()
+            }
+            .store(in: &subscriptions)
+
+        deleteToDo
+            .sink { [unowned self] indexSet in
+                toDos.remove(atOffsets: indexSet)
+                saveToDos()
+            }
+            .store(in: &subscriptions)
     }
 
     func loadToDos() {
