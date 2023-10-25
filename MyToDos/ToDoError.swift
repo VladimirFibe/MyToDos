@@ -5,9 +5,11 @@ enum ToDoError: Error, LocalizedError {
     case readError
     case decodingError
     case encodingError
+    case emptyError
 
     var errorDescription: String? {
         switch self {
+        case .emptyError: return NSLocalizedString("List empty", comment: "")
         case .saveError:
             return NSLocalizedString("Could not save ToDos, please reinstall the app.", comment: "")
         case .readError:
@@ -20,8 +22,7 @@ enum ToDoError: Error, LocalizedError {
     }
 }
 
-struct ErrorType: Identifiable {
-    let id = UUID().uuidString
+struct ErrorType {
     let error: ToDoError
     var message: String {
         error.localizedDescription

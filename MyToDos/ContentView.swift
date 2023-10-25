@@ -6,7 +6,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(dataStore.toDos.value) { todo in
+                ForEach(dataStore.toDos) { todo in
                     Button(action: {
                         modalType = .update(todo)
                     }) {
@@ -16,14 +16,16 @@ struct ContentView: View {
                         .foregroundStyle(todo.completed ? .green : Color(.label))
                     }
                 }
-                .onDelete(perform: dataStore.deleteToDo.send)
+                .onDelete(perform: dataStore.deleteToDo)
+            }
+            .task {
+                if FileManager().docExist(named: fileName) {
+                    dataStore.loadToDos()
+                }
             }
             .listStyle(.insetGrouped)
+            .navigationTitle("My ToDos")
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("My ToDos")
-                        .font(.largeTitle)
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
                         modalType = .new
@@ -35,9 +37,11 @@ struct ContentView: View {
             .foregroundStyle(.red)
         }
         .sheet(item: $modalType) { $0 }
-        .alert(item: $dataStore.appError.value) {
-            Alert(title: Text("Oh Oh"), message: Text($0.error.localizedDescription))
-        }
+        .alert(
+            "File Error",
+            isPresented: $dataStore.showAlert,
+            presenting: dataStore.appError
+        ) { $0.button } message: { Text($0.message) }
     }
 }
 

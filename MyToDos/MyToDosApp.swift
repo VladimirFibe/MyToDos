@@ -6,6 +6,9 @@ struct MyToDosApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(DataStore())
+//                .onAppear {
+//                    UserDefaults.standard.setValue(false, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable")
+//                }
         }
     }
 }
