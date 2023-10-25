@@ -5,6 +5,10 @@ class DataStore: ObservableObject {
     @Published var appError: ErrorType? = nil { didSet { showAlert = appError != nil }}
     @Published var showAlert = false { didSet { if !showAlert { appError = nil }}}
 
+    func newToDo() {
+        addToDo(ToDo(name: ""))
+    }
+    
     func addToDo(_ toDo: ToDo) {
         toDos.append(toDo)
     }
@@ -16,6 +20,16 @@ class DataStore: ObservableObject {
 
     func deleteToDo(at indexSet: IndexSet) {
         toDos.remove(atOffsets: indexSet)
+    }
+
+    func deleteToDo(_ toDo: ToDo) {
+        guard let index = toDos.firstIndex(where: { $0.id == toDo.id }) else { return }
+        toDos.remove(at: index)
+    }
+
+    func toggleToDo(_ toDo: ToDo) {
+        guard let index = toDos.firstIndex(where: { $0.id == toDo.id }) else { return }
+        toDos[index].completed.toggle()
     }
 
     func loadToDos() {
