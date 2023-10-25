@@ -1,7 +1,7 @@
 import SwiftUI
 import Combine
 class DataStore: ObservableObject {
-    @Published var toDos: [ToDo] = [] { didSet { if toDos.isEmpty { appError = ErrorType(error: .emptyError)}}}
+    @Published var toDos: [ToDo] = [] { didSet { saveToDos() }}
     @Published var appError: ErrorType? = nil { didSet { showAlert = appError != nil }}
     @Published var showAlert = false { didSet { if !showAlert { appError = nil }}}
 
@@ -19,18 +19,12 @@ class DataStore: ObservableObject {
     }
 
     func loadToDos() {
-        FileManager().readDocument(docName: fileName) { result in
-            switch result {
-            case .success(let data):
-                let decoder = JSONDecoder()
-                do {
-                    toDos = try decoder.decode([ToDo].self, from: data)
-                } catch {
-                    appError = ErrorType(error: .decodingError)
-                }
-            case .failure(let error):
-                appError = ErrorType(error: error)
-            }
+        do {
+            let data = try FileManager().readDocument(docName: fileName)
+            let decoder = JSONDecoder()
+            toDos = try decoder.decode([ToDo].self, from: data)
+        } catch {
+            appError = ErrorType(error: .decodingError)
         }
     }
 
@@ -40,11 +34,7 @@ class DataStore: ObservableObject {
         do {
             let data = try encoder.encode(toDos)
             let jsonString = String(decoding: data, as: UTF8.self)
-            FileManager().saveDocument(contents: jsonString, docName: fileName) { (error) in
-                if let error = error {
-                    appError = ErrorType(error: error)
-                }
-            }
+            try FileManager().saveDocument(contents: jsonString, docName: fileName)
         } catch {
             appError = ErrorType(error: .encodingError)
         }
