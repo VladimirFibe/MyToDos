@@ -4,7 +4,16 @@ class DataStore: ObservableObject {
     @Published var toDos: [ToDo] = [] { didSet { saveToDos() }}
     @Published var appError: ErrorType? = nil { didSet { showAlert = appError != nil }}
     @Published var showAlert = false { didSet { if !showAlert { appError = nil }}}
-
+    @Published var filterText = "" {
+        didSet {
+            if !filterText.isEmpty {
+                filteredToDos = toDos.filter { $0.name.lowercased().contains(filterText.lowercased())}
+            } else {
+                filteredToDos = toDos
+            }
+        }
+    }
+    @Published var filteredToDos: [ToDo] = []
     func newToDo() {
         addToDo(ToDo(name: ""))
     }
@@ -37,6 +46,7 @@ class DataStore: ObservableObject {
             let data = try FileManager().readDocument(docName: fileName)
             let decoder = JSONDecoder()
             toDos = try decoder.decode([ToDo].self, from: data)
+            filteredToDos = toDos
         } catch {
             appError = ErrorType(error: .decodingError)
         }

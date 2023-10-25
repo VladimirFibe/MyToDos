@@ -8,7 +8,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach($dataStore.toDos) { $todo in
+                ForEach($dataStore.filteredToDos) { $todo in
                     VStack {
                         if todo.completed {
                             Text(todo.name)
@@ -54,11 +54,7 @@ struct ContentView: View {
             .listStyle(.insetGrouped)
             .navigationTitle("My ToDos")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: dataStore.newToDo) {
-                        Image(systemName: "plus.circle.fill")
-                    }
-                }
+                ToolbarItem(placement: .topBarTrailing) { addButton }
                 ToolbarItem(placement: .keyboard) { keyboardButton }
             }
             .foregroundStyle(.red)
@@ -67,11 +63,18 @@ struct ContentView: View {
             focusedToDo = nil
         }
         .sheet(item: $modalType) { $0 }
+        .searchable(text: $dataStore.filterText, prompt: Text("Filter ToDos"))
         .alert(
             "File Error",
             isPresented: $dataStore.showAlert,
             presenting: dataStore.appError
         ) { $0.button } message: { Text($0.message) }
+    }
+
+    var addButton: some View {
+        Button(action: dataStore.newToDo) {
+            Image(systemName: "plus.circle.fill")
+        }
     }
 
     var keyboardButton: some View {
