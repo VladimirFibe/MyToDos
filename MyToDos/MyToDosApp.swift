@@ -1,14 +1,18 @@
 import SwiftUI
+import OSLog
 
 @main
 struct MyToDosApp: App {
+    let logger = Logger()
+
+    @State private var dataStore = DataStore()
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(DataStore())
-//                .onAppear {
-//                    UserDefaults.standard.setValue(false, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable")
-//                }
+                .environment(dataStore)
+                .onAppear {
+                    logger.info("\(URL.documentsDirectory.path())")
+                }
         }
     }
 }

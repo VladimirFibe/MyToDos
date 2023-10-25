@@ -1,14 +1,10 @@
 import Foundation
 
-var fileName = "ToDos.json"
 
 extension FileManager {
+    static let fileName = "ToDos.json"
 
-    static var docDirURL: URL {
-        return Self.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-    }
-
-    func saveDocument(contents: String, docName: String) throws {
+    func saveDocument(contents: String, docName: String = fileName) throws {
         let url = URL.documentsDirectory.appendingPathComponent(docName)
         do {
             try contents.write(to: url, atomically: true, encoding: .utf8)
@@ -18,7 +14,7 @@ extension FileManager {
     }
 
 
-    func readDocument(docName: String) throws -> Data {
+    func readDocument(docName: String = fileName) throws -> Data {
         let url = URL.documentsDirectory.appendingPathComponent(docName)
         do {
             let data = try Data(contentsOf: url)
@@ -28,7 +24,7 @@ extension FileManager {
         }
     }
 
-    func docExist(named docName: String) -> Bool {
+    func docExist(named docName: String = fileName) -> Bool {
         fileExists(atPath: URL.documentsDirectory.appendingPathComponent(docName).path)
     }
 }

@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var dataStore: DataStore
+    @Environment(DataStore.self) var dataStore
     @State private var modalType: ModalType? = nil
     @FocusState private var focusedToDo: Bool?
 
     var body: some View {
+        @Bindable var dataStore = dataStore
         NavigationStack {
             List {
                 ForEach($dataStore.filteredToDos) { $todo in
@@ -47,7 +48,7 @@ struct ContentView: View {
                 }
             }
             .task {
-                if FileManager().docExist(named: fileName) {
+                if FileManager().docExist() {
                     dataStore.loadToDos()
                 }
             }
@@ -89,5 +90,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environmentObject(DataStore())
+        .environment(DataStore())
 }

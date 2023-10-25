@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ToDoFormView: View {
-    @EnvironmentObject var dataStore: DataStore
+    @Environment(DataStore.self) var dataStore
     @ObservedObject var viewModel: ToDoFormViewModel
     @Environment(\.dismiss) var dismiss
     @FocusState private var focusedField: Field?
@@ -73,5 +73,5 @@ extension ToDoFormView {
 }
 #Preview {
     ToDoFormView(viewModel: ToDoFormViewModel())
-        .environmentObject(DataStore())
+        .environment(DataStore())
 }

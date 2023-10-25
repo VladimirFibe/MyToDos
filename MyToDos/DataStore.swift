@@ -1,10 +1,12 @@
 import SwiftUI
-import Combine
-class DataStore: ObservableObject {
-    @Published var toDos: [ToDo] = [] { didSet { saveToDos() }}
-    @Published var appError: ErrorType? = nil { didSet { showAlert = appError != nil }}
-    @Published var showAlert = false { didSet { if !showAlert { appError = nil }}}
-    @Published var filterText = "" {
+import Observation
+
+@Observable
+class DataStore {
+    var toDos: [ToDo] = [] { didSet { saveToDos() }}
+    var appError: ErrorType? = nil { didSet { showAlert = appError != nil }}
+    var showAlert = false { didSet { if !showAlert { appError = nil }}}
+    var filterText = "" {
         didSet {
             if !filterText.isEmpty {
                 filteredToDos = toDos.filter { $0.name.lowercased().contains(filterText.lowercased())}
@@ -13,7 +15,8 @@ class DataStore: ObservableObject {
             }
         }
     }
-    @Published var filteredToDos: [ToDo] = []
+    var filteredToDos: [ToDo] = []
+    
     func newToDo() {
         addToDo(ToDo(name: ""))
     }
@@ -43,7 +46,7 @@ class DataStore: ObservableObject {
 
     func loadToDos() {
         do {
-            let data = try FileManager().readDocument(docName: fileName)
+            let data = try FileManager().readDocument()
             let decoder = JSONDecoder()
             toDos = try decoder.decode([ToDo].self, from: data)
             filteredToDos = toDos
@@ -58,7 +61,7 @@ class DataStore: ObservableObject {
         do {
             let data = try encoder.encode(toDos)
             let jsonString = String(decoding: data, as: UTF8.self)
-            try FileManager().saveDocument(contents: jsonString, docName: fileName)
+            try FileManager().saveDocument(contents: jsonString)
         } catch {
             appError = ErrorType(error: .encodingError)
         }
